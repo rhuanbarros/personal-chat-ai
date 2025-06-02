@@ -1,12 +1,12 @@
 import pytest
-from fastapi.testclient import TestClient
-from main import app
+import requests
 
-client = TestClient(app)
+# Use the actual running server
+BASE_URL = "http://localhost:8000"
 
 def test_gemini_endpoint_basic():
-    # Send a simple message
-    response = client.post("/invoke_gemini", json={
+    # Send a simple message to the actual running API
+    response = requests.post(f"{BASE_URL}/invoke_gemini", json={
         "messages": [{"role": "user", "content": "Hello, how are you?"}]
     })
     
