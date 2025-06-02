@@ -17,4 +17,7 @@ uv pip install -e .
 #run tests
 pytest tests/test_gemini_simple.py -v
 
+
+
+source .venv/bin/activate
 ```
