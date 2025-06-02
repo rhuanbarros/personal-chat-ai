@@ -43,6 +43,17 @@ async def invoke_gemini_agent(request: InvokeRequest) -> Dict[str, str]:
     response_content = gemini_agent.invoke_completion(request.messages)
     return {"response": response_content}
 
+@app.post("/invoke_agent")
+async def invoke_agent(request: InvokeRequest) -> Dict[str, str]:
+    
+    gemini_agent = GeminiAgentBasic(
+        model_name=request.model_name,
+        temperature=request.temperature,
+        top_p=request.top_p
+    )
+    response_content = gemini_agent.invoke_completion(request.messages)
+    return {"response": response_content}
+
 @app.get("/health")
 async def health_check():
     return {
