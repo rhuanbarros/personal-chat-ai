@@ -1,10 +1,13 @@
 # Agents package
 from .research_agent import ResearchAgent
 from .models.research_models import ResearchInput, ResearchOutput, SearchResult
+from .langfuse_config import get_langfuse_handler, get_langfuse_callbacks
 
 __all__ = [
     "ResearchAgent",
     "ResearchInput", 
     "ResearchOutput",
-    "SearchResult"
+    "SearchResult",
+    "get_langfuse_handler",
+    "get_langfuse_callbacks"
 ] 

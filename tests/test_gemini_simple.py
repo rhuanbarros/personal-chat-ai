@@ -6,7 +6,7 @@ BASE_URL = "http://localhost:8000"
 
 def test_gemini_endpoint_basic():
     # Send a simple message to the actual running API
-    response = requests.post(f"{BASE_URL}/invoke_gemini", json={
+    response = requests.post(f"{BASE_URL}/invoke_agent", json={
         "messages": [{"role": "user", "content": "Hello, how are you?"}]
     })
     

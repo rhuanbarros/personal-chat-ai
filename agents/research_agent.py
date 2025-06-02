@@ -18,6 +18,7 @@ from .prompts.research_prompts import (
     DOCUMENT_ANALYSIS_PROMPT,
     WEB_SEARCH_SYSTEM_PROMPT
 )
+from .langfuse_config import get_langfuse_callbacks
 
 class ResearchState(TypedDict):
     """State object for LangGraph workflow"""
@@ -204,7 +205,9 @@ class ResearchAgent:
         try:
             # Use LLM for intelligent anonymization
             prompt = ANONYMIZATION_PROMPT.format(context=context)
-            response = self.llm.invoke([HumanMessage(content=prompt)])
+            callbacks = get_langfuse_callbacks()
+            config = {"callbacks": callbacks} if callbacks else {}
+            response = self.llm.invoke([HumanMessage(content=prompt)], config=config)
             anonymized = response.content.strip()
             
             # Fallback regex-based anonymization for extra safety
@@ -254,10 +257,12 @@ class ResearchAgent:
                 num_queries=num_queries
             )
             
+            callbacks = get_langfuse_callbacks()
+            config = {"callbacks": callbacks} if callbacks else {}
             response = self.llm.invoke([
                 SystemMessage(content=WEB_SEARCH_SYSTEM_PROMPT),
                 HumanMessage(content=prompt)
-            ])
+            ], config=config)
             
             # Parse queries from response
             queries = [q.strip() for q in response.content.strip().split('\n') if q.strip()]
@@ -305,10 +310,12 @@ class ResearchAgent:
                 search_results=json.dumps(formatted_docs, indent=2)
             )
             
+            callbacks = get_langfuse_callbacks()
+            config = {"callbacks": callbacks} if callbacks else {}
             response = self.llm.invoke([
                 SystemMessage(content=WEB_SEARCH_SYSTEM_PROMPT),
                 HumanMessage(content=prompt)
-            ])
+            ], config=config)
             
             # Parse JSON response
             try:

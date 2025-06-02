@@ -2,6 +2,7 @@ from langchain_core.messages import HumanMessage, AIMessage, SystemMessage, Base
 from langchain_google_genai import ChatGoogleGenerativeAI
 import os
 from typing import List, Union, Dict, Any
+from .langfuse_config import get_langfuse_callbacks
 
 class GeminiAgentBasic:
     def __init__(self, model_name: str = "gemini-2.0-flash", temperature: float = 0.7, top_p: float = 1.0):
@@ -56,9 +57,14 @@ class GeminiAgentBasic:
                 # Fallback for other types (e.g. simple strings), treat as human message
                 langchain_messages.append(HumanMessage(content=str(msg)))
 
-
         try:
-            response = self.llm.invoke(langchain_messages)
+            # Get Langfuse callbacks for observability
+            callbacks = get_langfuse_callbacks()
+            
+            # Create config with callbacks if available
+            config = {"callbacks": callbacks} if callbacks else {}
+            
+            response = self.llm.invoke(langchain_messages, config=config)
             return response.content  # type: ignore
         except Exception as e:
             # Basic error handling
