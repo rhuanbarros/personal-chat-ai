@@ -7,6 +7,7 @@ from pydantic import BaseModel
 from typing import List, Dict, Any, Optional
 from agents.gemini_agent_basic import GeminiAgentBasic
 
+
 # Load environment variables
 load_dotenv(dotenv_path=".env.local", override=True)
 
@@ -32,16 +33,6 @@ class InvokeRequest(BaseModel):
     model_name: Optional[str] = "gemini-2.0-flash"
     model_provider: Optional[str] = "google"
 
-@app.post("/invoke_gemini")
-async def invoke_gemini_agent(request: InvokeRequest) -> Dict[str, str]:
-    # Create agent with the requested parameters (excluding model_provider)
-    gemini_agent = GeminiAgentBasic(
-        model_name=request.model_name,
-        temperature=request.temperature,
-        top_p=request.top_p
-    )
-    response_content = gemini_agent.invoke_completion(request.messages)
-    return {"response": response_content}
 
 @app.post("/invoke_agent")
 async def invoke_agent(request: InvokeRequest) -> Dict[str, str]:
@@ -53,6 +44,10 @@ async def invoke_agent(request: InvokeRequest) -> Dict[str, str]:
     )
     response_content = gemini_agent.invoke_completion(request.messages)
     return {"response": response_content}
+
+
+
+
 
 @app.get("/health")
 async def health_check():
