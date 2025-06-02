@@ -48,7 +48,7 @@ class LangfuseConfig:
                 secret_key=secret_key,
                 public_key=public_key,
                 host=host,
-                debug=True  # Enable debug mode
+                debug=False  # Disable debug mode to reduce console output
             )
             print(f"Langfuse handler initialized successfully with host: {host}")
             
