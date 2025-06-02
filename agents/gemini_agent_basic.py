@@ -3,7 +3,7 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 import os
 from typing import List, Union, Dict, Any
 
-class GeminiAgent:
+class GeminiAgentBasic:
     def __init__(self, model_name: str = "gemini-2.0-flash", temperature: float = 0.7, top_p: float = 1.0):
         """
         Initializes the Gemini Agent.

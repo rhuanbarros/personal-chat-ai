@@ -5,7 +5,7 @@ import os
 from dotenv import load_dotenv
 from pydantic import BaseModel
 from typing import List, Dict, Any, Optional
-from agents.gemini_agent import GeminiAgent
+from agents.gemini_agent_basic import GeminiAgentBasic
 
 # Load environment variables
 load_dotenv(dotenv_path=".env.local", override=True)
@@ -35,7 +35,7 @@ class InvokeRequest(BaseModel):
 @app.post("/invoke_gemini")
 async def invoke_gemini_agent(request: InvokeRequest) -> Dict[str, str]:
     # Create agent with the requested parameters (excluding model_provider)
-    gemini_agent = GeminiAgent(
+    gemini_agent = GeminiAgentBasic(
         model_name=request.model_name,
         temperature=request.temperature,
         top_p=request.top_p
