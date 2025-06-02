@@ -17,7 +17,7 @@ services:
     networks:
       - app-network
     ports:
-      - "8000:8000"
+      - "8010:8000"
     environment:
       - PYTHON_ENV=development
-      - DATABASE_URL=mongodb://db:27017/personal_chat 
+      - DATABASE_URL=mongodb://db:27020/personal_chat 
