@@ -4,7 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 import os
 from dotenv import load_dotenv
 from pydantic import BaseModel
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Optional
 from agents.gemini_agent import GeminiAgent
 
 # Load environment variables
@@ -25,13 +25,21 @@ app.add_middleware( # type: ignore
     allow_headers=["*"],
 )
 
-gemini_agent = GeminiAgent()
-
 class InvokeRequest(BaseModel):
     messages: List[Dict[str, Any]]
+    temperature: Optional[float] = 0.7
+    top_p: Optional[float] = 1.0
+    model_name: Optional[str] = "gemini-2.0-flash"
+    model_provider: Optional[str] = "google"
 
 @app.post("/invoke_gemini")
 async def invoke_gemini_agent(request: InvokeRequest) -> Dict[str, str]:
+    # Create agent with the requested parameters (excluding model_provider)
+    gemini_agent = GeminiAgent(
+        model_name=request.model_name,
+        temperature=request.temperature,
+        top_p=request.top_p
+    )
     response_content = gemini_agent.invoke_completion(request.messages)
     return {"response": response_content}
 

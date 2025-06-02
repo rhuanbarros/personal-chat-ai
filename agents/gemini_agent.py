@@ -4,17 +4,19 @@ import os
 from typing import List, Union, Dict, Any
 
 class GeminiAgent:
-    def __init__(self, model_name: str = "gemini-2.0-flash", temperature: float = 0.7):
+    def __init__(self, model_name: str = "gemini-2.0-flash", temperature: float = 0.7, top_p: float = 1.0):
         """
         Initializes the Gemini Agent.
 
         Args:
             model_name (str): The name of the Gemini model to use.
             temperature (float): The temperature for the model's output.
+            top_p (float): The top_p (nucleus sampling) parameter for the model's output.
         """
         self.llm: ChatGoogleGenerativeAI = ChatGoogleGenerativeAI(
             model=model_name,
             temperature=temperature,
+            top_p=top_p,
             google_api_key=os.getenv("GEMINI_API_KEY") 
         )
 
