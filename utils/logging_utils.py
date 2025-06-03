@@ -29,21 +29,32 @@ def log_model_response(response_content: str, response_metadata: Optional[Dict] 
     if response_metadata:
         print(f"Response Metadata: {response_metadata}")
         
-        # Check for reasoning/thinking tokens in usage metadata
+        # Check for reasoning/thinking tokens in usage metadata using LangChain standard format
         usage_metadata = response_metadata.get('usage_metadata', {})
         if usage_metadata:
-            thoughts_tokens = usage_metadata.get('thoughts_token_count', 0)
             input_tokens = usage_metadata.get('input_tokens', 0)
             output_tokens = usage_metadata.get('output_tokens', 0)
             total_tokens = usage_metadata.get('total_tokens', 0)
+            
+            # Get reasoning tokens from output_token_details (LangChain standard format)
+            output_token_details = usage_metadata.get('output_token_details', {})
+            reasoning_tokens = output_token_details.get('reasoning', 0) if output_token_details else 0
+            
+            # Also check for legacy 'thoughts_token_count' for backward compatibility
+            legacy_thoughts_tokens = usage_metadata.get('thoughts_token_count', 0)
+            
+            # Use reasoning tokens if available, otherwise fall back to legacy format
+            actual_reasoning_tokens = reasoning_tokens if reasoning_tokens > 0 else legacy_thoughts_tokens
             
             print(f"Token Usage:")
             print(f"  Input tokens: {input_tokens}")
             print(f"  Output tokens: {output_tokens}")
             print(f"  Total tokens: {total_tokens}")
             
-            if thoughts_tokens > 0:
-                print(f"  🧠 Reasoning tokens: {thoughts_tokens}")
+            if actual_reasoning_tokens > 0:
+                print(f"  🧠 Reasoning tokens: {actual_reasoning_tokens}")
+                reasoning_ratio = (actual_reasoning_tokens / total_tokens) * 100 if total_tokens > 0 else 0
+                print(f"  📈 Reasoning ratio: {reasoning_ratio:.1f}% of total tokens")
                 print(f"  💡 Model used reasoning process!")
             else:
                 print(f"  No reasoning tokens detected")
@@ -82,19 +93,28 @@ def log_reasoning_tokens_info(usage_metadata: Dict[str, Any]) -> None:
         print("No usage metadata available")
         return
     
-    thoughts_tokens = usage_metadata.get('thoughts_token_count', 0)
     input_tokens = usage_metadata.get('input_tokens', 0)
     output_tokens = usage_metadata.get('output_tokens', 0)
     total_tokens = usage_metadata.get('total_tokens', 0)
+    
+    # Get reasoning tokens from output_token_details (LangChain standard format)
+    output_token_details = usage_metadata.get('output_token_details', {})
+    reasoning_tokens = output_token_details.get('reasoning', 0) if output_token_details else 0
+    
+    # Also check for legacy 'thoughts_token_count' for backward compatibility
+    legacy_thoughts_tokens = usage_metadata.get('thoughts_token_count', 0)
+    
+    # Use reasoning tokens if available, otherwise fall back to legacy format
+    actual_reasoning_tokens = reasoning_tokens if reasoning_tokens > 0 else legacy_thoughts_tokens
     
     print("🔍 Token Analysis:")
     print(f"  📥 Input: {input_tokens} tokens")
     print(f"  📤 Output: {output_tokens} tokens")
     print(f"  📊 Total: {total_tokens} tokens")
     
-    if thoughts_tokens > 0:
-        print(f"  🧠 Reasoning: {thoughts_tokens} tokens")
-        reasoning_ratio = (thoughts_tokens / total_tokens) * 100 if total_tokens > 0 else 0
+    if actual_reasoning_tokens > 0:
+        print(f"  🧠 Reasoning: {actual_reasoning_tokens} tokens")
+        reasoning_ratio = (actual_reasoning_tokens / total_tokens) * 100 if total_tokens > 0 else 0
         print(f"  📈 Reasoning ratio: {reasoning_ratio:.1f}% of total tokens")
         print(f"  💡 Model engaged in reasoning process!")
     else:
