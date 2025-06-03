@@ -3,7 +3,7 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_openai import ChatOpenAI
 from langchain_anthropic import ChatAnthropic
 import os
-from typing import List, Union, Dict, Any
+from typing import List, Union, Dict, Any, Tuple
 from .langfuse_config import get_langfuse_callbacks
 
 class ModelBasic:
@@ -48,9 +48,9 @@ class ModelBasic:
         else:
             raise ValueError(f"Unsupported model provider: {model_provider}. Supported providers: 'google', 'openai', 'anthropic'")
 
-    def invoke_completion(self, messages: List[Union[BaseMessage, Dict[str, Any]]]) -> str:
+    def invoke_completion_with_metadata(self, messages: List[Union[BaseMessage, Dict[str, Any]]]) -> Tuple[str, Dict[str, Any]]:
         """
-        Invokes the AI model with a list of messages and returns the response.
+        Invokes the AI model with a list of messages and returns both response content and metadata.
 
         Args:
             messages (List[Union[BaseMessage, Dict[str, Any]]]): A list of messages, 
@@ -59,10 +59,10 @@ class ModelBasic:
                 with "role" and "content" keys.
 
         Returns:
-            str: The AI's response content.
+            Tuple[str, Dict[str, Any]]: The AI's response content and metadata containing usage info.
         """
         if not messages:
-            return "No messages provided."
+            return "No messages provided.", {}
 
         langchain_messages: List[BaseMessage] = []
         for msg in messages:
@@ -97,8 +97,34 @@ class ModelBasic:
             config = {"callbacks": callbacks} if callbacks else {}
             
             response = self.llm.invoke(langchain_messages, config=config)
-            return response.content  # type: ignore
+            
+            # Extract metadata from response
+            metadata = {}
+            if hasattr(response, 'response_metadata'):
+                metadata = response.response_metadata or {}
+            
+            # Add usage metadata if available
+            if hasattr(response, 'usage_metadata'):
+                metadata['usage_metadata'] = response.usage_metadata or {}
+            
+            return response.content or "", metadata  # type: ignore
         except Exception as e:
             # Basic error handling
             print(f"Error invoking {self.model_provider} model: {e}")
-            return "An error occurred while processing your request." 
+            return "An error occurred while processing your request.", {}
+
+    def invoke_completion(self, messages: List[Union[BaseMessage, Dict[str, Any]]]) -> str:
+        """
+        Invokes the AI model with a list of messages and returns the response.
+
+        Args:
+            messages (List[Union[BaseMessage, Dict[str, Any]]]): A list of messages, 
+                where each message can be an instance of a Langchain BaseMessage 
+                (HumanMessage, AIMessage, SystemMessage) or a dictionary 
+                with "role" and "content" keys.
+
+        Returns:
+            str: The AI's response content.
+        """
+        content, _ = self.invoke_completion_with_metadata(messages)
+        return content 
