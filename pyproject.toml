@@ -21,4 +21,6 @@ dependencies = [
     "langgraph>=0.4.7",
     "typing_extensions>=4.5.0",
     "langfuse>=2.36.2",
+    "langchain-openai>=0.3.19",
+    "langchain-anthropic>=0.3.14",
 ]

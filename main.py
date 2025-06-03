@@ -36,6 +36,9 @@ class InvokeRequest(BaseModel):
 
 @app.post("/invoke_agent")
 async def invoke_agent(request: InvokeRequest) -> Dict[str, str]:
+
+    print("request")
+    print(request)
     
     gemini_agent = GeminiAgentBasic(
         model_name=request.model_name,
